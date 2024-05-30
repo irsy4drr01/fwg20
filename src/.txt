@@ -1,0 +1,11 @@
+routes          => Mengatur pembagian rute
+handlers        => memproses request dan mengirim response
+                   middleware terakhir yang digunakan u/ mengirim response
+                   spesifik ke masing masing rute
+repositories    => berisi kode kode yang berinteraksi dengan DATABASE
+middlewares     => handler yg sifatnya reuseable (bisa digunakan di tempat lain / beberapa rute)
+configs         => berisi konfigurasi bisa ke
+                   DATABASE
+                   E-Mail
+                   Service-service lain
+models          => Berisi bentuk bentuk data atau type yg biasanya digunakan u/ menerima data dr luar
