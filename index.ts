@@ -1,6 +1,7 @@
 import express from "express";
 import { Request, Response } from "express-serve-static-core";
 import * as dotenv from "dotenv";
+import morgan from "morgan";
 
 // load env ke project (sedini mungkin => maka diletakkan di awal)
 dotenv.config();
@@ -16,6 +17,10 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}))
 // false => objek normal
 // true  => objek dalam objek
+
+// logger
+const logger = morgan("dev");
+app.use(logger);
 
 // buat handler u/ rute API
 // app.METHOD
