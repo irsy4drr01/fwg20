@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Check CORS</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <h1>CORS</h1>
+    <button id="btn">Test CORS</button>
+    <p id="response"></p>
+  </body>
+  <script>
+    const patchReq = (email) => {
+      axios
+        .patch(`http://localhost:8000/users/${email}`, { username: "Budi Ahmad" })
+        .then((res) => (response.innerHTML = `<span>${res.data.msg}</span>`))
+        .catch((err) => console.log(err));
+    };
+    const getReq = () => {
+      const url = `http://localhost:8000/users`;
+      axios
+        .get(url, {
+          headers: {
+            "X-Headers": "HAHA",
+          },
+        })
+        .then((res) => (response.innerHTML = `<span>${res.data.msg}</span>`))
+        .catch((err) => console.log(err));
+    };
+    const btn = document.querySelector("#btn");
+    const response = document.querySelector("#response");    
+    btn.addEventListener("click", () => {
+      // getReq();
+      patchReq("budi@gmail.com");
+    });
+    // fetch("http://localhost:8080/api/v1/books")
+    //   .then((response) => response.json())
+    //   .then((data) => console.log(data))
+    //   .catch((err) => console.log(err));
+  </script>
+</html>
