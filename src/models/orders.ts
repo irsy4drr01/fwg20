@@ -15,8 +15,10 @@ export interface IdataOrder {
     total_amount: number;
     order_date: Date;
     status: string;
+    id: string;
 }
 
 export interface IorderParams {
     order_number: string;
+    id: string;
 }

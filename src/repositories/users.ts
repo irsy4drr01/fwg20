@@ -27,6 +27,18 @@ export const getAllUsers = (limit?: number, offset?: number): Promise<QueryResul
     return db.query(query, values);
 };
 
+// export const getOneUser = (email: string): Promise<QueryResult<IdataUser>> => {
+//     const query =
+//         `select
+//             username,
+//             email,
+//             uuid
+//         FROM users
+//         where email=$1`;
+//     const values = [email];
+//     return db.query(query, values);
+// };
+
 export const getOneUser = (uuid: string): Promise<QueryResult<IdataUser>> => {
     const query =
         `select
@@ -38,6 +50,7 @@ export const getOneUser = (uuid: string): Promise<QueryResult<IdataUser>> => {
     const values = [uuid];
     return db.query(query, values);
 };
+
 
 export const createUser = (body: IuserBody): Promise<QueryResult<IdataUser>> => {
     const query = 
@@ -54,7 +67,7 @@ export const createUser = (body: IuserBody): Promise<QueryResult<IdataUser>> => 
 };
 
 export const updateUser = (
-    uuid: string,
+    email: string,
     body: Partial<IuserBody>
 ): Promise<QueryResult<IdataUser>> => {
     let query = `UPDATE users SET `;
@@ -78,25 +91,25 @@ export const updateUser = (
     }
 
     query += `updated_at = NOW()
-    WHERE uuid = $${index}
+    WHERE email = $${index}
     RETURNING
         username,
         email,
         password,
         uuid`;
-    values.push(uuid);
+    values.push(email);
 
     return db.query(query, values);
 };
 
-export const updateUserSoftDelete = (uuid: string): Promise<QueryResult<IdataUser>> => {
+export const updateUserSoftDelete = (email: string): Promise<QueryResult<IdataUser>> => {
     const query =
         `update users
         set
             is_deleted = true            
-        where uuid = $1
+        where email = $1
         returning username as "user name", is_deleted`;    
-    return db.query(query, [uuid]);
+    return db.query(query, [email]);
 };
 
 export const registerUser = (
@@ -116,8 +129,8 @@ export const registerUser = (
     return db.query(query, values);
 };
 
-export const getPasswordUser = (uuid: string): Promise<QueryResult<{username: string, password: string}>> => {
-    const query = `SELECT username, password from users where uuid = $1`;
-    const values = [uuid];
+export const getPasswordUser = (email: string): Promise<QueryResult<{username: string, password: string, uuid: string}>> => {
+    const query = `SELECT username, password from users where email = $1`;
+    const values = [email];
     return db.query(query, values);
 };

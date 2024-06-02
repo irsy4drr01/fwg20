@@ -2,8 +2,9 @@ import { Request, Response } from "express-serve-static-core";
 
 import { getAllProduct, getOneProduct, createProduct, getCategories, updateProduct, updateProductSoftDelete } from "../repositories/product";
 import { IproductBody, IproductParams, IproductQuery, Sort} from "../models/product";
+import { IproductResponse } from "../models/response";
 
-export const getProduct = async (req: Request<{}, {}, {}, IproductQuery>, res: Response) => {
+export const getProduct = async (req: Request<{}, {}, {}, IproductQuery>, res: Response<IproductResponse>) => {
     try {
         const { product_name, category, min_price, max_price, sort, page, limit } = req.query;
 
@@ -58,7 +59,7 @@ export const getProduct = async (req: Request<{}, {}, {}, IproductQuery>, res: R
     }
 };
 
-export const getDetailProduct = async (req: Request<IproductParams>, res: Response) => {
+export const getDetailProduct = async (req: Request<IproductParams>, res: Response<IproductResponse>) => {
     const {uuid} = req.params;
     try {
         const result = await getOneProduct(uuid);
@@ -83,7 +84,7 @@ export const getDetailProduct = async (req: Request<IproductParams>, res: Respon
     }
 };
 
-export const createNewProduct = async (req: Request<{}, {}, IproductBody>, res: Response) => {
+export const createNewProduct = async (req: Request<{}, {}, IproductBody>, res: Response<IproductResponse>) => {
     try {
         const result = await createProduct(req.body);
         return res.status(201).json({
@@ -123,7 +124,9 @@ export const getCategoriesHandler = async (req: Request, res: Response) => {
     }
 };
 
-export const updateProductHandler = async (req: Request<{uuid: string}, {}, Partial<IproductBody>>, res: Response) => {
+export const updateProductHandler = async (
+    req: Request<{uuid: string}, {}, Partial<IproductBody>>,
+    res: Response<IproductResponse>) => {
     const { uuid } = req.params;
     try {
         const result = await updateProduct(uuid, req.body);
@@ -169,7 +172,9 @@ export const updateProductHandler = async (req: Request<{uuid: string}, {}, Part
     }
 };
 
-export const deleteProductHandler = async (req: Request<{uuid: string}, {}, Partial<IproductBody>>, res: Response) => {
+export const deleteProductHandler = async (
+    req: Request<{uuid: string}, {}, Partial<IproductBody>>,
+    res: Response<IproductResponse>) => {
     const { uuid } = req.params;
     try {
         const result = await updateProductSoftDelete(uuid);

@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 
 import { getProduct, getDetailProduct, createNewProduct, getCategoriesHandler, updateProductHandler, deleteProductHandler } from "../handlers/product";
+import { authorization } from "../middlewares/authorization";
 
 const productRouter = Router();
 
@@ -26,7 +27,7 @@ productRouter.get("/:uuid", getDetailProduct);
 
 // INSERT
 // Menambah product baru
-productRouter.post("/", createNewProduct);
+productRouter.post("/", authorization, createNewProduct);
 
 // UPDATE
 productRouter.patch("/:uuid", updateProductHandler);

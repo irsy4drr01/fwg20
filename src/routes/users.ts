@@ -5,10 +5,11 @@ import { authorization } from "../middlewares/authorization";
 const usersRouter = Router();
 
 usersRouter.get("/", getUsers);
-usersRouter.get("/:uuid", getDetailUser);
+//usersRouter.get("/:email", authorization, getDetailUser);
+usersRouter.get("/:uuid", authorization, getDetailUser);
 usersRouter.post("/", createNewUser);
-usersRouter.patch("/:uuid", updateUserHandler);
-usersRouter.delete("/:uuid", deleteUserHandler);
+usersRouter.patch("/:email", updateUserHandler);
+usersRouter.delete("/:email", deleteUserHandler);
 
 // register user
 usersRouter.post("/new", registerNewUser);
@@ -17,3 +18,6 @@ usersRouter.post("/new", registerNewUser);
 usersRouter.post("/account", loginUser);
 
 export default usersRouter;
+
+
+

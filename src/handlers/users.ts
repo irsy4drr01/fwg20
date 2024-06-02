@@ -6,7 +6,7 @@ import { getAllUsers, getOneUser, createUser, updateUser, updateUserSoftDelete, 
 import { IuserBody, IuserLoginBody, IuserParams, IuserQuery, IuserRegisterBody } from "../models/users";
 import { IAuthResponse, IuserResponse } from "../models/response";
 import { IPayload } from "../models/payload";
-import { SignOptions } from "jsonwebtoken";
+import { jwtOptions } from "../middlewares/authorization";
 
 export const getUsers = async (req: Request<{}, {}, {}, IuserQuery>, res: Response<IuserResponse>) => {
     try {
@@ -46,10 +46,35 @@ export const getUsers = async (req: Request<{}, {}, {}, IuserQuery>, res: Respon
     }
 };
 
+// export const getDetailUser = async (req: Request<IuserParams>, res: Response<IuserResponse>) => {
+//     const { email } = req.userPayload as IPayload;
+//     try {
+//         const result = await getOneUser(email as string);
+//         if (result.rows.length === 0) {
+//             return res.status(404).json({
+//                 msg: "User Not Found",
+//                 data: [],
+//             });
+//         }
+//         return res.status(200).json({
+//             msg: "Success",
+//             data: result.rows,
+//         });
+//     } catch (err) {
+//         if (err instanceof Error) {
+//             console.log(err.message);
+//         }
+//         return res.status(500).json({
+//             msg: "Error",
+//             err: "Internal Server Error",
+//         });
+//     }
+// };
+
 export const getDetailUser = async (req: Request<IuserParams>, res: Response<IuserResponse>) => {
     const { uuid } = req.params;
     try {
-        const result = await getOneUser(uuid);
+        const result = await getOneUser(uuid as string);
         if (result.rows.length === 0) {
             return res.status(404).json({
                 msg: "User Not Found",
@@ -59,17 +84,18 @@ export const getDetailUser = async (req: Request<IuserParams>, res: Response<Ius
         return res.status(200).json({
             msg: "Success",
             data: result.rows,
-        });
-    } catch (err) {
-        if (err instanceof Error) {
-            console.log(err.message);
+            });
+        } catch (err) {
+            if (err instanceof Error) {
+                console.log(err.message);
+            }
+            return res.status(500).json({
+                msg: "Error",
+                err: "Internal Server Error",
+            });
         }
-        return res.status(500).json({
-            msg: "Error",
-            err: "Internal Server Error",
-        });
-    }
 };
+
 
 export const createNewUser = async (req: Request<{}, {}, IuserBody>, res: Response<IuserResponse>) => {
     try {
@@ -79,10 +105,10 @@ export const createNewUser = async (req: Request<{}, {}, IuserBody>, res: Respon
             data: result.rows,
         })
     } catch (err) {
-        if ((err as Error).message.includes('duplicate key value violates unique constraint "username_unique"')) {
+        if ((err as Error).message.includes('duplicate key value violates unique constraint "unique_email"')) {
             return res.status(400).json({
                 msg: "Error",
-                err: "Username already exists",
+                err: "E-Mail already exists",
             });
         }
         console.error(err);
@@ -93,10 +119,10 @@ export const createNewUser = async (req: Request<{}, {}, IuserBody>, res: Respon
     }
 };
 
-export const updateUserHandler = async (req: Request<{uuid: string}, {}, Partial<IuserBody>>, res: Response<IuserResponse>) => {
-    const { uuid } = req.params;
+export const updateUserHandler = async (req: Request<{email: string}, {}, Partial<IuserBody>>, res: Response<IuserResponse>) => {
+    const { email } = req.params;
     try {
-        const result = await updateUser(uuid, req.body);
+        const result = await updateUser(email, req.body);
         if (result.rows.length === 0) {
             return res.status(404).json({
                 msg: "User Not Found",
@@ -108,20 +134,20 @@ export const updateUserHandler = async (req: Request<{uuid: string}, {}, Partial
             data: result.rows,
         });
     } catch (err) {
-        if ((err as Error).message.includes('invalid input syntax for type uuid: ":uuid"')) {
+        if ((err as Error).message.includes('invalid input syntax for type email: ":email"')) {
             return res.status(400).json({
                 msg: "Error",
-                err: "Blank UUID, please complete it",
+                err: "Blank E-Mail, please complete it",
             });
         }
-        const uuidError = /invalid input syntax for type uuid: "(.*?)"/;
-        const match = uuidError.exec((err as Error).message);
+        const emailError = /invalid input syntax for type email: "(.*?)"/;
+        const match = emailError.exec((err as Error).message);
 
         if (match) {
-            const invalidUuid = match[1];
+            const invalidEmail = match[1];
             return res.status(400).json({
                 msg: "Error",
-                err: `Invalid UUID: ${invalidUuid}`,
+                err: `Invalid email: ${invalidEmail}`,
             });
         }
 
@@ -133,10 +159,10 @@ export const updateUserHandler = async (req: Request<{uuid: string}, {}, Partial
     }
 };
 
-export const deleteUserHandler = async (req: Request<{uuid: string}, {}, Partial<IuserBody>>, res: Response<IuserResponse>) => {
-    const { uuid } = req.params;
+export const deleteUserHandler = async (req: Request<{email: string}, {}, Partial<IuserBody>>, res: Response<IuserResponse>) => {
+    const { email } = req.params;
     try {
-        const result = await updateUserSoftDelete(uuid);
+        const result = await updateUserSoftDelete(email);
         if (result.rows.length === 0) {
             return res.status(404).json({
                 msg: "User Not Found",
@@ -148,20 +174,20 @@ export const deleteUserHandler = async (req: Request<{uuid: string}, {}, Partial
             data: result.rows,
         });
     } catch (err) {
-        if ((err as Error).message.includes('invalid input syntax for type uuid: ":uuid"')) {
+        if ((err as Error).message.includes('invalid input syntax for type email: ":email"')) {
             return res.status(400).json({
                 msg: "Error",
-                err: "Blank UUID, please complete it",
+                err: "Blank E-Mail, please complete it",
             });
         }
-        const uuidError = /invalid input syntax for type uuid: "(.*?)"/;
-        const match = uuidError.exec((err as Error).message);
+        const emailError = /invalid input syntax for type email: "(.*?)"/;
+        const match = emailError.exec((err as Error).message);
 
         if (match) {
-            const invalidUuid = match[1];
+            const invalidEmail = match[1];
             return res.status(400).json({
                 msg: "Error",
-                err: `Invalid UUID: ${invalidUuid}`,
+                err: `Invalid E-Mail: ${invalidEmail}`,
             });
         }
 
@@ -187,6 +213,12 @@ export const registerNewUser = async (req: Request<{}, {}, IuserRegisterBody>, r
         if (error instanceof Error) {
           console.log(error.message);
         }
+        if ((error as Error).message.includes('duplicate key value violates unique constraint "unique_email"')) {
+            return res.status(400).json({
+                msg: "Error",
+                err: "E-Mail is already in use.",
+            });
+        }
         return res.status(500).json({
           msg: "Error",
           err: "Internal Server Error",
@@ -198,24 +230,21 @@ export const loginUser = async (
     req: Request<{}, {}, IuserLoginBody>,
     res: Response<IAuthResponse>) => {
     
-    const {uuid, password} = req.body;
+    const {email, password} = req.body;
     try {
-        const result = await getPasswordUser(uuid);
-        if (!result.rows.length) throw new Error("User tidak ditemukan");
+        const result = await getPasswordUser(email);
+        if (!result.rows.length) throw new Error("Login FAILED: incorrect E-Mail or Password.");
         
         const user = result.rows[0];
         const { password: hash, username } = user;
 
         const isPasswordValid = await bcrypt.compare(password, hash);
-        if (!isPasswordValid) throw new Error("Login gagal, Password Salah");
+        if (!isPasswordValid) throw new Error("Login FAILED: incorrect E-Mail or Password.");
         const payload: IPayload = {
-            uuid, // uuid: uuid
+            email, // email: email
           };
         
-        const jwtOptions: SignOptions = {
-            expiresIn: "5m", // token akan hangus dalam 5 menit
-            issuer: process.env.JWT_SECRET,
-        };
+        
         const token = jwt.sign(payload, <string>process.env.JWT_SECRET, jwtOptions);
         return res.status(200).json({
             msg: `Selamat datang, ${username}!`,
@@ -223,10 +252,10 @@ export const loginUser = async (
         })
     } catch (error) {
         if (error instanceof Error) {
-            if (/(invalid(.)+uuid(.)+)/g.test(error.message)) {
+            if (/(invalid(.)+email(.)+)/g.test(error.message)) {
                 return res.status(401).json({
                   msg: "Error",
-                  err: "Siswa tidak ditemukan",
+                  err: "Login FAILED: incorrect E-Mail or Password.",
                 });
             }
         return res.status(401).json({
