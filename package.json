@@ -2,7 +2,7 @@
   "name": "tugas-beginner_backend",
   "version": "1.0.0",
   "description": "Beginner Backend Coffee Shop",
-  "main": "server.ts",
+  "main": "index.ts",
   "scripts": {
     "build": "tsc --build",
     "start": "node ./dist/index.js",
