@@ -1,15 +1,9 @@
-export interface IdataUser extends IuserBody {    
-    uuid: string;
-    created_at: string;
-    updated_at: string | null;
-}
-
-export interface IuserParams {
-    
+export interface IuserParams {    
     uuid: string;
 }
 
 export interface IuserQuery {
+    username?: string;
     limit?: number;
     page?: number;
 }
@@ -20,17 +14,19 @@ export interface IuserBody {
     password?: string;
 }
 
-export interface IuserBody2 {
-    username?: string;
-    email?: string;
+export interface IdataUser extends IuserBody {    
+    uuid: string;
+    created_at: string;
+    updated_at: string | null;
+    id?: number;
 }
 
-export interface IuserRegisterBody extends IuserBody2 {
+export interface IuserRegisterBody extends IuserBody {
     password?: string;
     uuid?: string;
 }
 
-export interface IuserLoginBody {
+export interface IuserLogin {
     email: string;
     password: string;
 }

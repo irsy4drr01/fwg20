@@ -1,15 +1,16 @@
 import { Request, Response } from "express-serve-static-core";
 
-import { getAllProduct, getOneProduct, createProduct, getCategories, updateProduct, updateProductSoftDelete } from "../repositories/product";
+import { getAllProduct, getOneProduct, createProduct, getCategories, updateProduct, updateProductSoftDelete, getTotalProduct } from "../repositories/product";
 import { IproductBody, IproductParams, IproductQuery, Sort} from "../models/product";
-import { IproductResponse } from "../models/response";
+import { IproductResponse,  } from "../models/response";
+import getLink from "../helpers/getLink";
 
 export const getProduct = async (req: Request<{}, {}, {}, IproductQuery>, res: Response<IproductResponse>) => {
     try {
         const { product_name, category, min_price, max_price, sort, page, limit } = req.query;
 
-        const pageNumber = page || 1; // Halaman default adalah 1
-        const limitNumber = limit || 5; // Jumlah item per halaman default adalah 5
+        const pageNumber = parseInt(page as string) || 1; // Halaman default adalah 1
+        const limitNumber = parseInt(limit as string) || 5; // Jumlah item per halaman default adalah 5
         const offset = (pageNumber - 1) * limitNumber; // Menghitung offset berdasarkan halaman dan limit
 
         if (page && (pageNumber <= 0 || limitNumber <= 0)) {
@@ -44,10 +45,23 @@ export const getProduct = async (req: Request<{}, {}, {}, IproductQuery>, res: R
             });
         }
 
-        return res.status(200).json({
-            msg: "Success",
-            data: result.rows,
-        });
+        {
+            const dataProduct = await getTotalProduct(req.query);
+            const page = parseInt((req.query.page as string) || "1");
+            const totalData = parseInt(dataProduct.rows[0].total_product);
+            const totalPage = Math.ceil(totalData/parseInt(req.query.limit as string));
+            return res.status(200).json({
+                msg: "Success",
+                data: result.rows,
+                meta: {
+                    totalData,
+                    totalPage,
+                    page,
+                    prevLink: page > 1 ? getLink(req, "previous"): null,
+                    nextLink: page != totalPage ? getLink(req, "next"): null,
+                },
+            });
+        }
     } catch (err: unknown) {
         if (err instanceof Error) {
             console.log(err.message);

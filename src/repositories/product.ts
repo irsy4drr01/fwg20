@@ -27,7 +27,7 @@ export const getAllProduct = (
     const conditions: string[] = [];
 
     if (product_name) {
-        conditions.push(`      product_name ILIKE $${conditions.length + 1}`);
+        conditions.push(` product_name ILIKE $${conditions.length + 1}`);
         values.push(`%${product_name}%`);
     }
 
@@ -182,7 +182,17 @@ export const updateProductSoftDelete = (uuid: string): Promise<QueryResult<Idata
     return db.query(query, [uuid]);
 };
 
-
+export const getTotalProduct = ({
+    product_name,
+}: IproductQuery): Promise<QueryResult<{total_product: string}>> => {
+    let query = `select count(*) as "total_product" from product`;
+    const values = [];
+    if (product_name) {
+        query += ` where product_name ilike $1`;
+        values.push(`%${product_name}%`);
+    }
+    return db.query(query, values);
+};
 
 
 

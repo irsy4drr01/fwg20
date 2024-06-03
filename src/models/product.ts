@@ -19,8 +19,8 @@ export interface IproductQuery {
     min_price?: number;
     max_price?: number;
     sort?: string;
-    limit?: number;
-    page?: number;
+    limit?: string;
+    page?: string;
 }
 
 export type Sort = 

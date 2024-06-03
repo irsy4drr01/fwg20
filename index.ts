@@ -8,6 +8,7 @@ import cors, { CorsOptions } from "cors";
 dotenv.config();
 
 import router from "./src/routes"
+import getLink from "./src/helpers/getLink";
 
 
 // buat aplikasi express
@@ -26,10 +27,11 @@ app.use(logger);
 // cors
 const corsOption: CorsOptions = {
     origin: ["http://localhost:8080", "http://127.0.0.1:5500"],
-    methods: ["POST", "PATCH"],
+    methods: ["GET","POST", "PATCH"],
     // methods: ["GET", "POST", "PATCH"],
     // allowedHeaders: ["Authorization"],
-    allowedHeaders: ["Authorization", "x-headers"],
+    // allowedHeaders: ["Authorization", "x-headers"],
+    // allowedHeaders: [""],
 }
 app.use(cors(corsOption));
 
@@ -45,9 +47,16 @@ app.use(cors(corsOption));
 
 // 1. fungsi anonim  => app.get("/", (3 parameter) => {})
 // 2. fungsi bernama => dianjurkan
-app.get("/", (req: Request, res: Response) => {
-    res.send("OK");
+app.get("/test/base/url/:a", (req: Request, res: Response) => {
+    res.json({
+        ling: getLink(req, "next"),
+    });
 });
+
+// app.get("/", (req: Request, res: Response) => {
+//     res.send("OK");
+// });
+
 // http://localhost:8000/
 
 // get => pariadik ke 2 adalah handler (bisa 1 atau lebih)

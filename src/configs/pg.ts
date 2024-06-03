@@ -5,8 +5,9 @@ const config: PoolConfig = {
     user: process.env.DB_USER,
     database: process.env.DB_NAME,
     password: process.env.DB_PASS,
-    port: parseInt(process.env.DB_PORT as string) || 5432,
+    port: parseInt(process.env.DB_PORT as string) || 5432,    
 };
+
 
 const db = new Pool(config);
 

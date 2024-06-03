@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import { getAllUsers, getOneUser, createUser, updateUser, updateUserSoftDelete, registerUser, getPasswordUser } from "../repositories/users";
-import { IuserBody, IuserLoginBody, IuserParams, IuserQuery, IuserRegisterBody } from "../models/users";
+import { IuserBody, IuserLogin, IuserParams, IuserQuery, IuserRegisterBody } from "../models/users";
 import { IAuthResponse, IuserResponse } from "../models/response";
 import { IPayload } from "../models/payload";
 import { jwtOptions } from "../middlewares/authorization";
@@ -45,31 +45,6 @@ export const getUsers = async (req: Request<{}, {}, {}, IuserQuery>, res: Respon
         });
     }
 };
-
-// export const getDetailUser = async (req: Request<IuserParams>, res: Response<IuserResponse>) => {
-//     const { email } = req.userPayload as IPayload;
-//     try {
-//         const result = await getOneUser(email as string);
-//         if (result.rows.length === 0) {
-//             return res.status(404).json({
-//                 msg: "User Not Found",
-//                 data: [],
-//             });
-//         }
-//         return res.status(200).json({
-//             msg: "Success",
-//             data: result.rows,
-//         });
-//     } catch (err) {
-//         if (err instanceof Error) {
-//             console.log(err.message);
-//         }
-//         return res.status(500).json({
-//             msg: "Error",
-//             err: "Internal Server Error",
-//         });
-//     }
-// };
 
 export const getDetailUser = async (req: Request<IuserParams>, res: Response<IuserResponse>) => {
     const { uuid } = req.params;
@@ -227,7 +202,7 @@ export const registerNewUser = async (req: Request<{}, {}, IuserRegisterBody>, r
 };
 
 export const loginUser = async (
-    req: Request<{}, {}, IuserLoginBody>,
+    req: Request<{}, {}, IuserLogin>,
     res: Response<IAuthResponse>) => {
     
     const {email, password} = req.body;
